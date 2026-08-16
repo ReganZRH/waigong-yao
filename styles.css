@@ -114,6 +114,7 @@ th { background: #fbece1; color: #7c4a2a; }
 
 .cell { min-width: 70px; font-weight: 600; }
 .cell.taken { background: var(--green-bg); color: #14643d; }
+.cell.later { background: #fff3cd; color: #9a6b00; }
 .cell.missed { background: var(--red-bg); color: var(--red); animation: blink 1.3s infinite; }
 .cell.waiting { background: var(--grey-bg); color: #8a929a; font-weight: 400; }
 .cell.skipped { background: #efefef; color: #999; }
@@ -139,6 +140,14 @@ input[type="text"], input[type="password"] {
   border-radius: 10px;
   font-size: 1rem;
   width: 100%;
+  margin: 6px 0;
+}
+select {
+  padding: 10px;
+  border: 1.5px solid #e2d5c9;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: #fff;
   margin: 6px 0;
 }
 .small { font-size: .82rem; color: var(--grey); margin: 4px 0; }
@@ -178,6 +187,40 @@ input[type="text"], input[type="password"] {
 .med-btn.done { background: var(--green-bg); border-color: var(--green); color: #14643d; }
 #popupMeds { max-height: 52vh; overflow-y: auto; }
 .all-ok { margin: 12px 0; text-align: center; font-size: 1.3rem; color: var(--green); font-weight: 700; }
+
+.menu-btn {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 16px 12px;
+  font-size: 1.15rem;
+  border: 2.5px solid var(--grey);
+  background: #fff;
+  border-radius: 14px;
+  cursor: pointer;
+}
+.menu-btn.green { border-color: var(--green); color: #14643d; }
+.menu-btn.amber { border-color: #e6a23c; background: #fffbe6; color: #9a6b00; }
+.menu-btn.grey { border-color: #b8bdc3; color: #5f666d; }
+
+.edit-card { max-height: 86vh; overflow-y: auto; }
+.edit-med {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px 0;
+  background: #fdfaf7;
+}
+.edit-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.edit-row span { min-width: 64px; font-size: .9rem; }
+.edit-row input[type="text"], .edit-row input[type="time"] {
+  flex: 1;
+  min-width: 100px;
+  margin: 4px 0;
+}
+.slot-checks { margin: 8px 0 4px; }
+.slot-checks label { margin-right: 14px; font-size: .95rem; }
+.del-btn { padding: 6px 12px; font-size: .85rem; }
 
 #toast {
   position: fixed;

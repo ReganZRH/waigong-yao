@@ -37,7 +37,9 @@
       <table id="medTable"></table>
     </div>
 
-    <p class="hint" id="hintLine">红色 = 还没确认吃；绿色 = 已吃；灰色 = 跳过。到点后每 3 小时提醒一次，直到确认。</p>
+    <button class="btn primary big" id="quickEditBtn" style="margin-top:12px">✏️ 编辑药单（加药 / 改剂量 / 改时间 / 次数）</button>
+
+    <p class="hint" id="hintLine">红色 = 还没吃；绿色 = 已吃；黄色 = 一会再吃。长按格子可以改状态；没确认会按你设置的间隔继续提醒。</p>
   </main>
 
   <footer class="toolbar">
@@ -49,6 +51,7 @@
   <details id="settings" class="settings">
     <div class="card">
       <h2>设置</h2>
+      <button class="btn" id="editBtn">✏️ 编辑时间表（加药 / 改剂量 / 改时间）</button>
       <label class="row"><input type="checkbox" id="voiceOn"> 语音播报提醒</label>
       <label class="row"><input type="checkbox" id="bigText"> 大字模式</label>
       <label class="row">本机名称：<input type="text" id="deviceName" maxlength="8" placeholder="家人"></label>
@@ -73,6 +76,30 @@
       <div class="btn-row">
         <button class="btn" id="popupSkipBtn">跳过本次</button>
         <button class="btn" id="popupCloseBtn">稍后再说</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 长按格子的状态菜单 -->
+  <div class="overlay" id="cellMenu">
+    <div class="card popup-card">
+      <h2 id="cellMenuTitle">药品</h2>
+      <div id="cellMenuBtns"></div>
+      <div class="btn-row">
+        <button class="btn" id="cellMenuCloseBtn">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 编辑时间表 -->
+  <div class="overlay" id="editModal">
+    <div class="card popup-card edit-card">
+      <h2>编辑时间表</h2>
+      <p class="small">改动保存后，所有家人手机都会同步成新时间表。</p>
+      <div id="editBody"></div>
+      <div class="btn-row">
+        <button class="btn primary" id="saveEditBtn">💾 保存并同步</button>
+        <button class="btn" id="cancelEditBtn">取消</button>
       </div>
     </div>
   </div>
