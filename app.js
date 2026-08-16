@@ -655,7 +655,7 @@ const sync = {
       reRemindHours: state.schedule.reRemindHours || APP.reRemindHours
     };
     try {
-      await fetch(this.base() + "/settings?on_conflict=id", {
+      await fetch(this.base() + "/settings", {
         method: "POST",
         headers: Object.assign({ Prefer: "resolution=merge-duplicates" }, this.headers()),
         body: JSON.stringify([{
