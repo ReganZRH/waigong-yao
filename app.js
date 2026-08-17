@@ -80,6 +80,10 @@ function saveGroup(g) { localStorage.setItem(LS_GROUP, JSON.stringify(g)); group
 const hasTriggers = typeof Notification !== "undefined" &&
   "showTrigger" in Notification.prototype &&
   "TimestampTrigger" in window;
+function isStandalone() {
+  try { return window.matchMedia("(display-mode: standalone)").matches; }
+  catch (e) { return false; }
+}
 
 async function scheduleAll() {
   if (typeof Notification === "undefined" || Notification.permission !== "granted" || !hasTriggers) return;
@@ -102,7 +106,7 @@ async function scheduleAll() {
           if (t.getHours() >= APP.quietStartHour) break;
           if (t.getTime() <= Date.now()) continue;
           const body = "到时间了：" + slotMeds(slot.id).map(medLabel).join("、") + "，请确认是否已吃";
-          new Notification(APP.appName, {
+          await reg.showNotification(APP.appName, {
             tag: "wxcy-" + ds + "-" + slot.id,
             body: body,
             icon: "icon-192.png",
@@ -253,7 +257,10 @@ function renderNotify() {
     const trig = hasTriggers
       ? "定时通知可用，到点会自动弹"
       : "但当前浏览器不支持定时通知：请使用 Chrome 打开并“添加到主屏幕”";
-    box.innerHTML = '<div class="notice ok">🔔 系统提醒已开启（' + trig + '）</div>';
+    const extra = isStandalone()
+      ? ""
+      : '<div class="notice warn">提醒需要先“添加到主屏幕 / 安装应用”，并从桌面图标打开 App，才能后台弹通知。</div>';
+    box.innerHTML = '<div class="notice ok">🔔 系统提醒已开启（' + trig + '）</div>' + extra;
   } else if (Notification.permission === "denied") {
     box.innerHTML = '<div class="notice warn">通知权限被拒绝，请在浏览器设置中允许通知后刷新。</div>';
   } else {
@@ -782,26 +789,26 @@ async function testNotification() {
       return;
     }
   }
+  if (!isStandalone()) {
+    toast("请先“添加到主屏幕 / 安装应用”，再从桌面图标打开 App 后测试");
+    return;
+  }
   if (!hasTriggers) {
-    try {
-      new Notification(APP.appName, { body: "测试：你的浏览器不支持定时通知", icon: "icon-192.png" });
-      toast("已弹普通通知（但定时通知不可用，需 Chrome 添加到主屏幕）");
-    } catch (e) {
-      toast("发送失败：" + e.message);
-    }
+    toast("当前浏览器不支持定时通知（请用 Chrome）");
     return;
   }
   try {
+    const reg = await navigator.serviceWorker.ready;
     const t = new Date(Date.now() + 8000);
-    new Notification(APP.appName, {
+    await reg.showNotification(APP.appName, {
       tag: "wxcy-test",
       body: "这是一条测试通知，8 秒后弹出",
       icon: "icon-192.png",
       showTrigger: new TimestampTrigger(t)
     });
-    toast("测试通知已安排，8 秒后弹出，请留意屏幕");
+    toast("测试通知已安排，8 秒后弹出（请退出 App 等待）");
   } catch (e) {
-    toast("安排失败：" + e.message);
+    toast("发送失败：" + (e && e.name ? e.name + "：" + e.message : String(e)));
   }
 }
 

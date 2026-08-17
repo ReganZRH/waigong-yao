@@ -1,4 +1,4 @@
-const CACHE = "wxcy-v4";
+const CACHE = "wxcy-v5";
 const ASSETS = [
   "./",
   "./index.html",
