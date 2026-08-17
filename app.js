@@ -250,7 +250,10 @@ function renderNotify() {
     return;
   }
   if (Notification.permission === "granted") {
-    box.innerHTML = '<div class="notice ok">🔔 系统提醒已开启：6:00 / 12:00 / 18:00 提醒，未确认每 3 小时再提醒一次</div>';
+    const trig = hasTriggers
+      ? "定时通知可用，到点会自动弹"
+      : "但当前浏览器不支持定时通知：请使用 Chrome 打开并“添加到主屏幕”";
+    box.innerHTML = '<div class="notice ok">🔔 系统提醒已开启（' + trig + '）</div>';
   } else if (Notification.permission === "denied") {
     box.innerHTML = '<div class="notice warn">通知权限被拒绝，请在浏览器设置中允许通知后刷新。</div>';
   } else {
@@ -258,6 +261,7 @@ function renderNotify() {
     $("enableNotifyBtn").onclick = async () => {
       const p = await Notification.requestPermission();
       if (p === "granted") { renderNotify(); scheduleAll(); toast("提醒已开启"); }
+      else { renderNotify(); toast("未允许通知，提醒不会弹出"); }
     };
   }
 }
@@ -720,6 +724,8 @@ function bindSettings() {
   $("deviceName").onchange = (e) => localStorage.setItem(LS_DEVICE, e.target.value.trim() || "家人");
   $("editBtn").onclick = openEditModal;
   $("quickEditBtn").onclick = openEditModal;
+  $("testNotifyBtn").onclick = testNotification;
+  $("testPopupBtn").onclick = testPopup;
   $("cancelEditBtn").onclick = closeEditModal;
   $("saveEditBtn").onclick = saveEdit;
   $("cellMenuCloseBtn").onclick = () => $("cellMenu").classList.remove("show");
@@ -760,6 +766,52 @@ function toast(msg) {
   t.classList.add("show");
   clearTimeout(t._timer);
   t._timer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+/* ============ 测试：系统通知 / 页面弹窗 ============ */
+async function testNotification() {
+  if (typeof Notification === "undefined") {
+    toast("此浏览器不支持通知，请用 Chrome");
+    return;
+  }
+  if (Notification.permission !== "granted") {
+    const p = await Notification.requestPermission();
+    if (p !== "granted") {
+      toast("没有通知权限，无法测试");
+      renderNotify();
+      return;
+    }
+  }
+  if (!hasTriggers) {
+    try {
+      new Notification(APP.appName, { body: "测试：你的浏览器不支持定时通知", icon: "icon-192.png" });
+      toast("已弹普通通知（但定时通知不可用，需 Chrome 添加到主屏幕）");
+    } catch (e) {
+      toast("发送失败：" + e.message);
+    }
+    return;
+  }
+  try {
+    const t = new Date(Date.now() + 8000);
+    new Notification(APP.appName, {
+      tag: "wxcy-test",
+      body: "这是一条测试通知，8 秒后弹出",
+      icon: "icon-192.png",
+      showTrigger: new TimestampTrigger(t)
+    });
+    toast("测试通知已安排，8 秒后弹出，请留意屏幕");
+  } catch (e) {
+    toast("安排失败：" + e.message);
+  }
+}
+
+function testPopup() {
+  const slot = SCHED.periods[0];
+  let meds = slotMeds(slot.id).filter((m) => statusOf(dateStr(), slot.id, m) !== "taken");
+  if (!meds.length && slotMeds(slot.id).length) meds = [slotMeds(slot.id)[0]];
+  if (!meds.length) return toast("时间表里还没有药，先去编辑药单");
+  showPopup({ slot: slot, meds: meds, key: "test" + Date.now() });
+  toast("这是测试弹窗");
 }
 
 async function init() {
